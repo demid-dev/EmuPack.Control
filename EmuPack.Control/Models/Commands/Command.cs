@@ -12,11 +12,12 @@ namespace EmuPack.Control.Models.Commands
         public string SendFrom { get; protected set; }
         public string SendTo { get; protected set; }
         public string DataLength { get; protected set; }
+        public string CommandString { get; protected set; }
 
         public Command()
         {
-            SendFrom = CommandResponseValues.SendFrom;
-            SendTo = CommandResponseValues.SendTo;
+            SendFrom = CommandValues.SendFrom;
+            SendTo = CommandValues.SendTo;
         }
 
         protected virtual string FormCommand()
@@ -28,17 +29,75 @@ namespace EmuPack.Control.Models.Commands
             stringBuilder.Append(DataLength);
             return stringBuilder.ToString();
         }
+
+        public virtual string NormalizeCommandField(string fieldToNormalize, int fieldLength, CommandPadding padding)
+        {
+            string normalizedField = fieldToNormalize;
+            if (padding == CommandPadding.Zeroing)
+            {
+                for (int i = 0; i < fieldLength - fieldToNormalize.Length; i++)
+                {
+                    normalizedField = CommandValues.ZeroPadSymbol + normalizedField;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < fieldLength - fieldToNormalize.Length; i++)
+                {
+                    normalizedField += CommandValues.SpacePadSymbol;
+                }
+            }
+
+            return normalizedField;
+        }
+
+        public virtual string NormalizeCommandField(int fieldToNormalize, int fieldLength, CommandPadding padding)
+        {
+            string stringFieldToNormalize = fieldToNormalize.ToString();
+            string normalizedField = stringFieldToNormalize;
+            if (padding == CommandPadding.Zeroing)
+            {
+                for (int i = 0; i < fieldLength - stringFieldToNormalize.Length; i++)
+                {
+                    normalizedField = CommandValues.ZeroPadSymbol + normalizedField;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < fieldLength - stringFieldToNormalize.Length; i++)
+                {
+                    normalizedField += CommandValues.SpacePadSymbol;
+                }
+            }
+
+            return normalizedField;
+        }
     }
 
-    static class CommandResponseValues
+    static class CommandValues
     {
         static public string SendFrom { get; private set; }
         static public string SendTo { get; private set; }
+        static public int DataLengthLength { get; private set; }
 
-        static CommandResponseValues()
+        static public char ZeroPadSymbol { get; private set; }
+        static public char SpacePadSymbol { get; private set; }
+
+        static CommandValues()
         {
             SendFrom = "C1";
             SendTo = "M1";
+            DataLengthLength = 5;
+
+            ZeroPadSymbol = '0';
+            SpacePadSymbol = ' ';
         }
     }
+
+    public enum CommandPadding
+    {
+        Zeroing,
+        Spacing
+    }
+
 }
