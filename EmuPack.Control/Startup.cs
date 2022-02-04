@@ -1,4 +1,6 @@
+using EmuPack.Control.Hubs;
 using EmuPack.Control.Services;
+using EmuPack.Control.Services.Operations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -33,9 +35,12 @@ namespace EmuPack.Control
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "EmuPack.Control", Version = "v1" });
             });
 
+            services.AddSignalR();
+
             services.AddSingleton<MachineClient>()
                     .AddSingleton<NotificationService>()
-                    .AddSingleton<ResponseParsingService>();
+                    .AddSingleton<ResponseProcessingService>()
+                    .AddSingleton<OperationsHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +62,7 @@ namespace EmuPack.Control
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/notification-hub");
             });
         }
     }
