@@ -1,17 +1,26 @@
-﻿using EmuPack.Control.Models.Machine;
+﻿using EmuPack.Control.DTOs;
+using EmuPack.Control.Models;
+using EmuPack.Control.Models.Commands;
+using EmuPack.Control.Models.Machine;
+using EmuPack.Control.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EmuPack.Control.Services
 {
     public class MachineClient
     {
-        private readonly TcpClient _tcpClient;
+        private readonly ResponseProcessingService _responseProcessingService;
+        private readonly NotificationService _notificationService;
+
+        private TcpClient _tcpClient;
         private NetworkStream _stream;
 
         public MachineState MachineState { get; private set; }
@@ -19,46 +28,112 @@ namespace EmuPack.Control.Services
         {
             get
             {
-                return _tcpClient.Connected;
+                if (_tcpClient == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return _tcpClient.Connected;
+                }
             }
         }
 
-        public MachineClient()
+        public MachineClient(ResponseProcessingService responseProcessingService,
+            NotificationService notificationService)
         {
-            MachineState = new MachineState();
+            _responseProcessingService = responseProcessingService;
+            _notificationService = notificationService;
 
-            _tcpClient = new TcpClient();
+            MachineState = new MachineState();
         }
 
         public void Connect(string hostname, int port)
         {
             try
             {
+                _tcpClient = new TcpClient();
                 _tcpClient.Connect(hostname, port);
                 _stream = _tcpClient.GetStream();
+                Thread receiveResponsesThread = new Thread(new ThreadStart(ReceiveServerResponse));
+                receiveResponsesThread.Start();
             }
-            catch(Exception ex)
+            catch (Exception)
             {
-
+                _notificationService.SendTcpErrorNotification(NotificationType.TcpConnectionError, 
+                    hostname, port);
+            }
+            finally
+            {
+                if (_stream != null)
+                    _stream.Close();
+                if (_tcpClient != null)
+                    _tcpClient.Close();
             }
         }
 
-        public void SendMessage(string message)
+        public void SendCommand(Command command)
         {
-            byte[] data = Encoding.ASCII.GetBytes(message);
-            _stream.Write(data, 0, data.Length);
+            try
+            {
+                if(_tcpClient != null)
+                {
+                    byte[] data = Encoding.ASCII.GetBytes(command.CommandString);
+                    _stream.Write(data, 0, data.Length);
+                }
+                else
+                {
+                    throw new NullReferenceException(nameof(_tcpClient));
+                }
+            }
+            catch (Exception)
+            {
+                IPEndPoint ipEndpoint = _tcpClient.Client.RemoteEndPoint as IPEndPoint;
+                _notificationService.SendTcpErrorNotification(NotificationType.TcpSendMessageError,
+                    ipEndpoint.Address.ToString(), ipEndpoint.Port);
+            }
+            finally
+            {
+                if (_stream != null)
+                    _stream.Close();
+                if (_tcpClient != null)
+                    _tcpClient.Close();
+            }
         }
 
-        public void ReceiveMessage(StringBuilder messageSpace)
+        private void ReceiveServerResponse()
         {
             byte[] data = new byte[99999];
-            int bytes = 0;
-            do
+            try
             {
-                bytes = _stream.Read(data, 0, data.Length);
-                messageSpace.Append(Encoding.ASCII.GetString(data, 0, bytes));
+                while (true)
+                {
+                    StringBuilder builder = new StringBuilder();
+                    int bytes = 0;
+                    do
+                    {
+                        bytes = _stream.Read(data, 0, data.Length);
+                        builder.Append(Encoding.ASCII.GetString(data, 0, bytes));
+                    }
+                    while (_stream.DataAvailable);
+                    string message = builder.ToString();
+
+                    _responseProcessingService.ProcessResponse(message, MachineState);
+                }
             }
-            while (_stream.DataAvailable);
+            catch (Exception)
+            {
+                IPEndPoint ipEndpoint = _tcpClient.Client.RemoteEndPoint as IPEndPoint;
+                _notificationService.SendTcpErrorNotification(NotificationType.TcpReceivingError,
+                    ipEndpoint.Address.ToString(), ipEndpoint.Port);
+            }
+            finally
+            {
+                if (_stream != null)
+                    _stream.Close();
+                if (_tcpClient != null)
+                    _tcpClient.Close();
+            }
         }
     }
 }
