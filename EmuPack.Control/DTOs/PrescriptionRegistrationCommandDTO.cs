@@ -11,10 +11,10 @@ namespace EmuPack.Control.DTOs
         [Range(0, 9999)]
         public int PrescriptionId { get; set; }
         [Required]
-        public List<RxRegistrationCommandDrugDTO> RxRegistrationCommandDrugsDTOs { get; set; }
+        public List<PrescriptionRegistrationDrugDTO> RxRegistrationCommandDrugsDTOs { get; set; }
     }
 
-    public class RxRegistrationCommandDrugDTO
+    public class PrescriptionRegistrationDrugDTO
     {
         [Range(1, 40)]
         public int CassetteId { get; set; }
