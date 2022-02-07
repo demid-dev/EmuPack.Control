@@ -50,7 +50,19 @@ namespace EmuPack.Control.Controllers
         [HttpGet("test-status-response")]
         public ActionResult GetStatusCommandResponseTest()
         {
-            return Ok(new StatusCommandResponse("SRM1C1000090001023020"));
+            return Ok(new StatusCommandResponse("SRM1C10000900010200100015023020"));
+        }
+
+        [HttpPost("test-mapping")]
+        public ActionResult TestMapping(DispensingOperationDTO dto)
+        {
+            return Ok(_operationsHandler.DispensingOperationHandler.MapDispensingDtoToRegistrationDto(dto));
+        }
+
+        [HttpPost("test-mapping2")]
+        public ActionResult TestMapping2(DispensingOperationDTO dto)
+        {
+            return Ok(_operationsHandler.DispensingOperationHandler.MapDispensingDtoToFillDtos(dto));
         }
     }
 }
