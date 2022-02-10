@@ -34,7 +34,7 @@ namespace EmuPack.Control.Models.Responses
                     .Substring(StatusCommandResponseValues.RegistredPrescriptionsIdsStartIndex
                     + i * StatusCommandResponseValues.RegistredPrescriptionsIdsLength,
                     StatusCommandResponseValues.RegistredPrescriptionsIdsLength);
-                RegistredPrescriptionsIds.Add(presriptionId);
+                RegistredPrescriptionsIds.Add(GetNumberWithoutPadding(presriptionId));
 
                 warningCassettesQuantityStartIndex += StatusCommandResponseValues.RegistredPrescriptionsIdsLength;
             }
