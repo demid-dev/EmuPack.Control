@@ -7,6 +7,14 @@ namespace EmuPack.Control.Models.Commands
 {
     public class StatusRequestCommand : Command
     {
+        public StatusRequestCommand()
+        {
+            CommandID = StatusRequestCommandValues.CommandId;
+            DataLength = NormalizeCommandField(0,
+                CommandValues.DataLengthLength,
+                CommandPadding.Zeroing);
+            CommandString = FormCommand();
+        }
     }
 
     static class StatusRequestCommandValues
