@@ -60,11 +60,8 @@ namespace EmuPack.Control.Services
             }
             catch (Exception)
             {
-                _notificationService.SendTcpErrorNotification(NotificationType.TcpConnectionError, 
-                    hostname, port);
-            }
-            finally
-            {
+                _notificationService.SendTcpConnectionErrorNotification(hostname, port);
+
                 if (_stream != null)
                     _stream.Close();
                 if (_tcpClient != null)
@@ -76,36 +73,35 @@ namespace EmuPack.Control.Services
         {
             try
             {
-                if(_tcpClient != null)
+                if (_tcpClient != null)
                 {
                     byte[] data = Encoding.ASCII.GetBytes(command.CommandString);
                     _stream.Write(data, 0, data.Length);
+                    Thread.Sleep(100);
                 }
                 else
                 {
-                    throw new NullReferenceException(nameof(_tcpClient));
+                    throw new NullReferenceException();
                 }
             }
             catch (Exception)
             {
-                IPEndPoint ipEndpoint = _tcpClient.Client.RemoteEndPoint as IPEndPoint;
-                _notificationService.SendTcpErrorNotification(NotificationType.TcpSendMessageError,
-                    ipEndpoint.Address.ToString(), ipEndpoint.Port);
-            }
-            finally
-            {
+                _notificationService.SendTcpCommunicationErrorNotification(NotificationType.TcpSendMessageError);
+
                 if (_stream != null)
                     _stream.Close();
                 if (_tcpClient != null)
+                {
                     _tcpClient.Close();
+                }
             }
         }
 
         private void ReceiveServerResponse()
         {
             byte[] data = new byte[99999];
-            try
-            {
+            //try
+            //{
                 while (true)
                 {
                     StringBuilder builder = new StringBuilder();
@@ -120,20 +116,18 @@ namespace EmuPack.Control.Services
 
                     _responseProcessingService.ProcessResponse(message, MachineState);
                 }
-            }
-            catch (Exception)
-            {
-                IPEndPoint ipEndpoint = _tcpClient.Client.RemoteEndPoint as IPEndPoint;
-                _notificationService.SendTcpErrorNotification(NotificationType.TcpReceivingError,
-                    ipEndpoint.Address.ToString(), ipEndpoint.Port);
-            }
-            finally
-            {
-                if (_stream != null)
-                    _stream.Close();
-                if (_tcpClient != null)
-                    _tcpClient.Close();
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    _notificationService.SendTcpCommunicationErrorNotification(NotificationType.TcpReceivingError);
+
+            //    if (_stream != null)
+            //        _stream.Close();
+            //    if (_tcpClient != null)
+            //    {
+            //        _tcpClient.Close();
+            //    }
+            //}
         }
     }
 }
