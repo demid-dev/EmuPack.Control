@@ -40,7 +40,9 @@ namespace EmuPack.Control
             services.AddSingleton<MachineClient>()
                     .AddSingleton<NotificationService>()
                     .AddSingleton<ResponseProcessingService>()
-                    .AddSingleton<OperationsHandler>();
+                    .AddSingleton<DispensingOperationHandler>()
+                    .AddSingleton<InitializationOperationHandler>()
+                    .AddSingleton<StatusOperationHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
