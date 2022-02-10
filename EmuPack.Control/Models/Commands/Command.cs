@@ -27,6 +27,7 @@ namespace EmuPack.Control.Models.Commands
             stringBuilder.Append(SendFrom);
             stringBuilder.Append(SendTo);
             stringBuilder.Append(DataLength);
+
             return stringBuilder.ToString();
         }
 
