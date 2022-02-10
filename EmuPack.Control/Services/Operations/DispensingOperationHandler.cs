@@ -1,27 +1,68 @@
 ﻿using EmuPack.Control.DTOs;
 using EmuPack.Control.Models.Commands;
+using EmuPack.Control.Models.Machine;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EmuPack.Control.Services.Operations
 {
     public class DispensingOperationHandler
     {
-        public void Dispense(MachineClient client,
-            DispensingOperationDTO dto)
-        {
-            RequestStatus(client);
+        private readonly MachineClient _machineClient;
+        private readonly StatusOperationHandler _statusHandler;
 
-            RegistratePrescription(client, MapDispensingDtoToRegistrationDto(dto));
-            MapDispensingDtoToFillDtos(dto).ForEach(fillDto => ExecuteFilling(client, fillDto));
+        public DispensingOperationHandler(MachineClient machineClient,
+            StatusOperationHandler statusHandler)
+        {
+            _machineClient = machineClient;
+            _statusHandler = statusHandler;
         }
 
-        private void RequestStatus(MachineClient client)
+        public void Dispense(DispensingOperationDTO dto)
         {
-            StatusRequestCommand command = new StatusRequestCommand();
-            client.SendCommand(command);
+            _statusHandler.UpdateMachineState();
+            if (DispensingIsPossible(dto))
+            {
+                RegistratePrescription(MapDispensingDtoToRegistrationDto(dto));
+                MapDispensingDtoToFillDtos(dto).ForEach(fillDto => ExecuteFilling(fillDto));
+            }
+
+            ChangeDrawerStatus(drawerLocked: false);
+            _statusHandler.UpdateMachineState();
+        }
+
+        private bool DispensingIsPossible(DispensingOperationDTO dto)
+        {
+            bool dispensingIsPossible = true;
+            if (_machineClient.MachineState.DrawerOpened)
+            {
+                ChangeDrawerStatus(drawerLocked: true);
+            }
+            if (!_machineClient.MachineState.AdaptorInDrawer)
+            {
+                dispensingIsPossible = false;
+            }
+            if (_machineClient.MachineState.RegistredPrescriptionsIds
+                .Contains(dto.PrescriptionId.ToString()))
+            {
+                dispensingIsPossible = false;
+            }
+
+            return dispensingIsPossible;
+        }
+
+        private void ChangeDrawerStatus(bool drawerLocked)
+        {
+            MachineActivityRequestCommandDTO commandDto = new MachineActivityRequestCommandDTO
+            {
+                DrawerShouldBeLocked = drawerLocked
+            };
+            MachineActivityRequestCommand command = new MachineActivityRequestCommand(commandDto);
+            _machineClient.SendCommand(command);
         }
 
         public PrescriptionRegistrationCommandDTO MapDispensingDtoToRegistrationDto(DispensingOperationDTO dispensingDTO)
@@ -80,7 +121,8 @@ namespace EmuPack.Control.Services.Operations
                 {
                     dto.CassetteUsedInFilling.Add(new CassetteUsedInFillingDTO
                     {
-                        QuantityOfDrug = drug.UsedPodDTOs.Sum(pod => pod.QuantityOfDrug),
+                        QuantityOfDrug = drug.UsedPodDTOs
+                            .First(pod=>pod.PodPosition == podPosition).QuantityOfDrug,
                         CassetteId = drug.CassetteId
                     });
                     dto.PodPosition = podPosition;
@@ -92,18 +134,16 @@ namespace EmuPack.Control.Services.Operations
             return fillCommandDTOs;
         }
 
-        private void RegistratePrescription(MachineClient client,
-            PrescriptionRegistrationCommandDTO dto)
+        private void RegistratePrescription(PrescriptionRegistrationCommandDTO dto)
         {
             PrescriptionRegistrationCommand command = new PrescriptionRegistrationCommand(dto);
-            client.SendCommand(command);
+            _machineClient.SendCommand(command);
         }
 
-        private void ExecuteFilling(MachineClient client,
-            FillCommandDTO dto)
+        private void ExecuteFilling(FillCommandDTO dto)
         {
             FillCommand command = new FillCommand(dto);
-            client.SendCommand(command);
+            _machineClient.SendCommand(command);
         }
     }
 }
