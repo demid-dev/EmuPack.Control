@@ -18,11 +18,16 @@ namespace EmuPack.Control.Services
             _hubContext = hubContext;
         }
 
-        public async void SendTcpErrorNotification(NotificationType notificationType,
-            string hostname, int port)
+        public async void SendTcpConnectionErrorNotification(string hostname, int port)
         {
             await _hubContext.Clients.All.SendAsync("ReceiveNotification",
-                GenerateNotificationDTO(notificationType, GenerateTcpWarningFields(hostname, port)));
+                GenerateNotificationDTO(NotificationType.TcpConnectionError, GenerateTcpWarningFields(hostname, port)));
+        }
+
+        public async void SendTcpCommunicationErrorNotification(NotificationType notificationType)
+        {
+            await _hubContext.Clients.All.SendAsync("ReceiveNotification",
+                GenerateNotificationDTO(notificationType, null));
         }
 
         public async void SendMachineBlockedCommandNotification(CommandResponse response)
