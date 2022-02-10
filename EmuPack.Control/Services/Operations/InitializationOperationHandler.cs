@@ -9,17 +9,24 @@ namespace EmuPack.Control.Services.Operations
 {
     public class InitializationOperationHandler
     {
-        public void InitializeMachine(MachineClient client)
+        private readonly MachineClient _machineClient;
+
+        public InitializationOperationHandler(MachineClient machineClient)
         {
-            if (!client.ConnectedToMachine)
+            _machineClient = machineClient;
+        }
+
+        public void InitializeMachine()
+        {
+            if (!_machineClient.ConnectedToMachine)
             {
-                client.Connect(InitializationOperationHandlerValues.Hostname,
+                _machineClient.Connect(InitializationOperationHandlerValues.Hostname,
                     InitializationOperationHandlerValues.Port);
             }
-            if (client.ConnectedToMachine)
+            if (_machineClient.ConnectedToMachine)
             {
                 InitializationCommand command = new InitializationCommand();
-                client.SendCommand(command);
+                _machineClient.SendCommand(command);
             }
         }
     }
