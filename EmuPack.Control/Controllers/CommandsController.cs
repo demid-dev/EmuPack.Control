@@ -18,13 +18,19 @@ namespace EmuPack.Control.Controllers
     public class CommandsController : ControllerBase
     {
         private readonly MachineClient _machineClient;
-        private readonly OperationsHandler _operationsHandler;
+        private readonly InitializationOperationHandler _initHandler;
+        private readonly DispensingOperationHandler _dispenseHandler;
+        private readonly StatusOperationHandler _statusHandler;
 
         public CommandsController(MachineClient machineClient,
-            OperationsHandler operationsHandler)
+            InitializationOperationHandler initHandler,
+            DispensingOperationHandler dispenseHandler,
+            StatusOperationHandler statusHandler)
         {
             _machineClient = machineClient;
-            _operationsHandler = operationsHandler;
+            _initHandler = initHandler;
+            _dispenseHandler = dispenseHandler;
+            _statusHandler = statusHandler;
         }
 
         [HttpPost("fill")]
@@ -36,7 +42,7 @@ namespace EmuPack.Control.Controllers
         [HttpPost("connect")]
         public ActionResult ConnectToMachine()
         {
-            _operationsHandler.InitializationOperationHandler.InitializeMachine(_machineClient);
+            _initHandler.InitializeMachine();
 
             return Ok();
         }
@@ -50,19 +56,27 @@ namespace EmuPack.Control.Controllers
         [HttpGet("test-status-response")]
         public ActionResult GetStatusCommandResponseTest()
         {
-            return Ok(new StatusCommandResponse("SRM1C10000900010200100015023020"));
+            _statusHandler.UpdateMachineState();
+            return Ok(_machineClient.MachineState);
         }
 
         [HttpPost("test-mapping")]
         public ActionResult TestMapping(DispensingOperationDTO dto)
         {
-            return Ok(_operationsHandler.DispensingOperationHandler.MapDispensingDtoToRegistrationDto(dto));
+            return Ok(_dispenseHandler.MapDispensingDtoToRegistrationDto(dto));
         }
 
         [HttpPost("test-mapping2")]
         public ActionResult TestMapping2(DispensingOperationDTO dto)
         {
-            return Ok(_operationsHandler.DispensingOperationHandler.MapDispensingDtoToFillDtos(dto));
+            return Ok(_dispenseHandler.MapDispensingDtoToFillDtos(dto));
+        }
+
+        [HttpPost("test-dispensing")]
+        public ActionResult TestDispensing(DispensingOperationDTO dto)
+        {
+            _dispenseHandler.Dispense(dto);
+            return Ok();
         }
     }
 }
