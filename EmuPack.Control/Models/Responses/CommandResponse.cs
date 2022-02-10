@@ -28,6 +28,15 @@ namespace EmuPack.Control.Models.Responses
                 CommandResponseValues.ResponseCodeLength);
             ResponseString = response;
         }
+
+        protected virtual string GetNumberWithoutPadding(string number)
+        {
+            while (number.Length > 1 && number[0] == '0')
+            {
+                number = number.Remove(0, 1);
+            }
+            return number;
+        }
     }
 
     public enum CommandResponseCodes
