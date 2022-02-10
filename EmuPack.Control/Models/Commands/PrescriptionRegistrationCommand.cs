@@ -16,6 +16,7 @@ namespace EmuPack.Control.Models.Commands
 
         public PrescriptionRegistrationCommand(PrescriptionRegistrationCommandDTO dto)
         {
+            CommandID = PrescriptionRegistrationCommandValues.CommandId;
             RegistrationStartNotification = PrescriptionRegistrationCommandValues.RegistrationStartNotification;
             PrescriptionId = NormalizeCommandField(dto.PrescriptionId,
                 PrescriptionRegistrationCommandValues.PrescriptionIdLength,
@@ -35,7 +36,7 @@ namespace EmuPack.Control.Models.Commands
                     CommandPadding.Spacing);
                 string quantityPerCassette = NormalizeCommandField(drug.QuantityPerCassette,
                     PrescriptionRegistrationCommandValues.QuantityPerCassetteLength,
-                    CommandPadding.Spacing);
+                    CommandPadding.Zeroing);
                 RxRegistrationCommandDrugs.Add(new RxRegistrationCommandDrug(cassetteId,
                     drugName, quantityPerCassette));
             });
