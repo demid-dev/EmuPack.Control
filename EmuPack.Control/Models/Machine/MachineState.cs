@@ -12,7 +12,6 @@ namespace EmuPack.Control.Models.Machine
         public bool AdaptorInDrawer { get; private set; }
         public List<string> RegistredPrescriptionsIds { get; private set; }
         public List<string> WarningCassettesIds { get; private set; }
-        public int LastUpdateId { get; private set; }
 
         public MachineState()
         {
@@ -33,8 +32,6 @@ namespace EmuPack.Control.Models.Machine
 
             RegistredPrescriptionsIds = statusCommandResponse.RegistredPrescriptionsIds;
             WarningCassettesIds = statusCommandResponse.WarningCassettesIds;
-
-            LastUpdateId++;
         }
     }
 }
