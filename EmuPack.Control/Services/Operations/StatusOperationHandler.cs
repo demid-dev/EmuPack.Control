@@ -19,9 +19,8 @@ namespace EmuPack.Control.Services.Operations
 
         public void UpdateMachineState()
         {
-            int lastUpdateId = _machineClient.MachineState.LastUpdateId;
             RequestStatus();
-            WaitUntilMachineStateUpdated(lastUpdateId);
+            WaitUntilMachineStateUpdated();
         }
 
         private void RequestStatus()
@@ -30,12 +29,8 @@ namespace EmuPack.Control.Services.Operations
             _machineClient.SendCommand(command);
         }
 
-        private void WaitUntilMachineStateUpdated(int idBeforeUpdate)
+        private void WaitUntilMachineStateUpdated()
         {
-            //while (idBeforeUpdate == _machineClient.MachineState.LastUpdateId)
-            //{
-            //    Debug.WriteLine(idBeforeUpdate + "|" + _machineClient.MachineState.LastUpdateId);
-            //};
             Thread.Sleep(200);
         }
     }
