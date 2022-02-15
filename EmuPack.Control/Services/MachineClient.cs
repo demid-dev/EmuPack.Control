@@ -100,8 +100,8 @@ namespace EmuPack.Control.Services
         private void ReceiveServerResponse()
         {
             byte[] data = new byte[99999];
-            //try
-            //{
+            try
+            {
                 while (true)
                 {
                     StringBuilder builder = new StringBuilder();
@@ -116,18 +116,18 @@ namespace EmuPack.Control.Services
 
                     _responseProcessingService.ProcessResponse(message, MachineState);
                 }
-            //}
-            //catch (Exception)
-            //{
-            //    _notificationService.SendTcpCommunicationErrorNotification(NotificationType.TcpReceivingError);
+            }
+            catch (Exception)
+            {
+                _notificationService.SendTcpCommunicationErrorNotification(NotificationType.TcpReceivingError);
 
-            //    if (_stream != null)
-            //        _stream.Close();
-            //    if (_tcpClient != null)
-            //    {
-            //        _tcpClient.Close();
-            //    }
-            //}
+                if (_stream != null)
+                    _stream.Close();
+                if (_tcpClient != null)
+                {
+                    _tcpClient.Close();
+                }
+            }
         }
     }
 }
