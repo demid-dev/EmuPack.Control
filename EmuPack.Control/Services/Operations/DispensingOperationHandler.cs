@@ -14,12 +14,15 @@ namespace EmuPack.Control.Services.Operations
     {
         private readonly MachineClient _machineClient;
         private readonly StatusOperationHandler _statusHandler;
+        private readonly NotificationService _notificationService;
 
         public DispensingOperationHandler(MachineClient machineClient,
-            StatusOperationHandler statusHandler)
+            StatusOperationHandler statusHandler,
+            NotificationService notificationService)
         {
             _machineClient = machineClient;
             _statusHandler = statusHandler;
+            _notificationService = notificationService;
         }
 
         public void Dispense(DispensingOperationDTO dto)
@@ -37,22 +40,25 @@ namespace EmuPack.Control.Services.Operations
 
         private bool DispensingIsPossible(DispensingOperationDTO dto)
         {
-            bool dispensingIsPossible = true;
+            bool adaptorInDrawer = true;
+            bool prescriptionNotRegistred = true;
             if (_machineClient.MachineState.DrawerOpened)
             {
                 ChangeDrawerStatus(drawerLocked: true);
             }
             if (!_machineClient.MachineState.AdaptorInDrawer)
             {
-                dispensingIsPossible = false;
+                adaptorInDrawer = false;
             }
             if (_machineClient.MachineState.RegistredPrescriptionsIds
                 .Contains(dto.PrescriptionId.ToString()))
             {
-                dispensingIsPossible = false;
+                prescriptionNotRegistred = false;
             }
+            _notificationService.SendDispensingIsNotPossibleNotification(adaptorInDrawer,
+                prescriptionNotRegistred);
 
-            return dispensingIsPossible;
+            return adaptorInDrawer && prescriptionNotRegistred;
         }
 
         private void ChangeDrawerStatus(bool drawerLocked)
@@ -122,7 +128,7 @@ namespace EmuPack.Control.Services.Operations
                     dto.CassetteUsedInFilling.Add(new CassetteUsedInFillingDTO
                     {
                         QuantityOfDrug = drug.UsedPodDTOs
-                            .First(pod=>pod.PodPosition == podPosition).QuantityOfDrug,
+                            .First(pod => pod.PodPosition == podPosition).QuantityOfDrug,
                         CassetteId = drug.CassetteId
                     });
                     dto.PodPosition = podPosition;
