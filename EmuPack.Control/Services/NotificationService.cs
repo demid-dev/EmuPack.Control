@@ -37,6 +37,17 @@ namespace EmuPack.Control.Services
                     GenerateMachineBlockedCommandWarningFields(response)));
         }
 
+        public async void SendDispensingIsNotPossibleNotification(bool adaptorInDrawer,
+            bool prescriptionNotRegistred)
+        {
+            if (!adaptorInDrawer || !prescriptionNotRegistred)
+            {
+                await _hubContext.Clients.All.SendAsync("ReceiveNotification",
+                    GenerateNotificationDTO(NotificationType.DispensingNotPossibleError,
+                        GenerateDispensingNotPossibleFields(adaptorInDrawer, prescriptionNotRegistred)));
+            }
+        }
+
         public async void SendCassetteWarningNotification(StatusCommandResponse response)
         {
             await _hubContext.Clients.All.SendAsync("ReceiveNotification",
@@ -58,6 +69,31 @@ namespace EmuPack.Control.Services
                 new WarningFieldDTO { FieldName = "Response command id", Value = response.CommandId },
                 new WarningFieldDTO { FieldName = "Response command string", Value = response.ResponseString}
             };
+        }
+
+        private List<WarningFieldDTO> GenerateDispensingNotPossibleFields(bool adaptorInDrawer,
+            bool prescriptionNotRegistred)
+        {
+            List<WarningFieldDTO> warningFieldDTOs = new List<WarningFieldDTO>();
+
+            if (!adaptorInDrawer)
+            {
+                warningFieldDTOs.Add(new WarningFieldDTO
+                {
+                    FieldName = "Adaptor in drawer",
+                    Value = "false"
+                });
+            }
+            if (!prescriptionNotRegistred)
+            {
+                warningFieldDTOs.Add(new WarningFieldDTO
+                {
+                    FieldName = "Prescription is already registred",
+                    Value = "true"
+                });
+            }
+
+            return warningFieldDTOs;
         }
 
         private List<WarningFieldDTO> GenerateWarningCassettesFields(StatusCommandResponse response)
