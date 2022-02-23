@@ -14,20 +14,22 @@ namespace EmuPack.Control.Services.Operations
     {
         private readonly MachineClient _machineClient;
         private readonly StatusOperationHandler _statusHandler;
+        private readonly InitializationOperationHandler _initializationHandler;
         private readonly NotificationService _notificationService;
 
         public DispensingOperationHandler(MachineClient machineClient,
             StatusOperationHandler statusHandler,
+            InitializationOperationHandler initializationHandler,
             NotificationService notificationService)
         {
             _machineClient = machineClient;
             _statusHandler = statusHandler;
+            _initializationHandler = initializationHandler;
             _notificationService = notificationService;
         }
 
         public void Dispense(DispensingOperationDTO dto)
         {
-            _statusHandler.UpdateMachineState();
             if (DispensingIsPossible(dto))
             {
                 RegistratePrescription(MapDispensingDtoToRegistrationDto(dto));
@@ -42,6 +44,11 @@ namespace EmuPack.Control.Services.Operations
         {
             bool adaptorInDrawer = true;
             bool prescriptionNotRegistred = true;
+            if (!_machineClient.ConnectedToMachine)
+            {
+                _initializationHandler.InitializeMachine();
+            }
+            _statusHandler.UpdateMachineState();
             if (_machineClient.MachineState.DrawerOpened)
             {
                 ChangeDrawerStatus(drawerLocked: true);
@@ -55,7 +62,7 @@ namespace EmuPack.Control.Services.Operations
             {
                 prescriptionNotRegistred = false;
             }
-            _notificationService.SendDispensingIsNotPossibleNotification(adaptorInDrawer,
+            _notificationService.SendDispensingNotification(adaptorInDrawer,
                 prescriptionNotRegistred);
 
             return adaptorInDrawer && prescriptionNotRegistred;
