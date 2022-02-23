@@ -1,0 +1,137 @@
+<form [formGroup]="form" (ngSubmit)="sumbit()">
+  <div class="row">
+    <div class="col-4">
+      <label for="prescriptionId" class="form-label">Prescription number</label>
+      <input type="number" class="form-control" id="prescriptionId" formControlName="prescriptionId">
+      <small class="error" *ngIf="form.get('prescriptionId')?.errors?.['required']">
+        Prescription ID cannot be empty
+      </small>
+      <small class="error" *ngIf="form.get('prescriptionId')?.errors?.['min']">
+        Prescription ID cannot be less than 1
+      </small>
+      <small class="error" *ngIf="form.get('prescriptionId')?.errors?.['max']">
+        Prescription ID cannot be greater than 9999
+      </small>
+    </div>
+    <div class="col-5">
+    </div>
+    <div class="col-3">
+      <button type="button" class="btn dispensing-btn" (click)="addDispensingDrug()">Add dispensing drug</button>
+    </div>
+  </div>
+  <hr/>
+  <div class="row col-lg-12 col-md col-sm col dispensing-drug"
+       *ngFor="let dispensingDrug of getDispensingDrugsArrayControls(); let idx = index"
+       [formGroup]="getDispensingDrugsControls(idx)">
+    <div class="row">
+      <div class="col-lg-6">
+        <label for="cassetteId" class="form-label">Cassette ID</label>
+        <input type="number" class="form-control" id="cassetteId" formControlName="cassetteId">
+        <small class="error" *ngIf="getDispensingDrugsControls(idx).get('cassetteId')?.errors?.['required']">
+          Cassette ID cannot be empty
+        </small>
+        <small class="error" *ngIf="getDispensingDrugsControls(idx).get('cassetteId')?.errors?.['min']">
+          Cassette ID cannot be less than 1
+        </small>
+        <small class="error" *ngIf="getDispensingDrugsControls(idx).get('cassetteId')?.errors?.['max']">
+          Cassette ID cannot be greater than 40
+        </small>
+      </div>
+      <div class="col-lg-6">
+        <label for="drugName" class="form-label">Drug name</label>
+        <input type="text" class="form-control" id="drugName" formControlName="drugName" placeholder="Input dispensing drug name">
+        <small class="error" *ngIf="getDispensingDrugsControls(idx).get('drugName')?.errors?.['required']
+        && getDispensingDrugsControls(idx).get('drugName')?.touched">
+          Drug name cannot be empty
+        </small>
+        <small class="error" *ngIf="getDispensingDrugsControls(idx).get('drugName')?.errors?.['maxlength']
+        && getDispensingDrugsControls(idx).get('drugName')?.touched">
+          Drug name length cannot be greater than 30
+        </small>
+      </div>
+    </div>
+    <div class="row used-pod">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">A</th>
+            <th scope="col">B</th>
+            <th scope="col">C</th>
+            <th scope="col">D</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let number of [0,1,2,3,4,5,6];">
+            <th scope="row">{{number}}</th>
+            <td [formGroup]="getUsedPodControls(getDispensingDrugsControls(idx), number * 4)">
+              <input hidden formControlName="podPosition">
+              <input type="number" class="form-control" formControlName="quantityOfDrug">
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4).get('quantityOfDrug')?.errors?.['required']">
+                Cannot be empty
+              </small>
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4).get('quantityOfDrug')?.errors?.['min']">
+                Cannot be less than 0
+              </small>
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4).get('quantityOfDrug')?.errors?.['max']">
+                Cannot be greater than 99
+              </small>
+            </td>
+            <td [formGroup]="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 1)">
+              <input hidden formControlName="podPosition">
+              <input type="number" class="form-control" formControlName="quantityOfDrug">
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 1).get('quantityOfDrug')?.errors?.['required']">
+                Cannot be empty
+              </small>
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 1).get('quantityOfDrug')?.errors?.['min']">
+                Cannot be less than 0
+              </small>
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 1).get('quantityOfDrug')?.errors?.['max']">
+                Cannot be greater than 99
+              </small>
+            </td>
+            <td [formGroup]="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 2)">
+              <input hidden formControlName="podPosition">
+              <input type="number" class="form-control" formControlName="quantityOfDrug">
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 2).get('quantityOfDrug')?.errors?.['required']">
+                Cannot be empty
+              </small>
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 2).get('quantityOfDrug')?.errors?.['min']">
+                Cannot be less than 0
+              </small>
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 2).get('quantityOfDrug')?.errors?.['max']">
+                Cannot be greater than 99
+              </small>
+            </td>
+            <td [formGroup]="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 3)">
+              <input hidden formControlName="podPosition">
+              <input type="number" class="form-control" formControlName="quantityOfDrug">
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 3).get('quantityOfDrug')?.errors?.['required']">
+                Cannot be empty
+              </small>
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 3).get('quantityOfDrug')?.errors?.['min']">
+                Cannot be less than 0
+              </small>
+              <small class="error" *ngIf="getUsedPodControls(getDispensingDrugsControls(idx), number * 4 + 3).get('quantityOfDrug')?.errors?.['max']">
+                Cannot be greater than 99
+              </small>
+            </td>
+
+          </tr>
+          </tbody>
+        </table>
+        <small class="error" *ngIf="getDispensingDrugsControls(idx).get('usedPods')?.errors?.['noPodGreaterThanZero']">
+          At least one dispensing pod should have more than 0 drugs
+        </small>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-9">
+    </div>
+    <div class="col-3">
+      <button type="submit" class="btn submit-btn" [disabled]="form.invalid">Dispense</button>
+    </div>
+  </div>
+</form>
