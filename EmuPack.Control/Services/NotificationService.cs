@@ -37,10 +37,15 @@ namespace EmuPack.Control.Services
                     GenerateMachineBlockedCommandWarningFields(response)));
         }
 
-        public async void SendDispensingIsNotPossibleNotification(bool adaptorInDrawer,
+        public async void SendDispensingNotification(bool adaptorInDrawer,
             bool prescriptionNotRegistred)
         {
-            if (!adaptorInDrawer || !prescriptionNotRegistred)
+            if (adaptorInDrawer && prescriptionNotRegistred)
+            {
+                await _hubContext.Clients.All.SendAsync("ReceiveNotification",
+                    GenerateNotificationDTO(NotificationType.DispensingSucessful, null));
+            }
+            else
             {
                 await _hubContext.Clients.All.SendAsync("ReceiveNotification",
                     GenerateNotificationDTO(NotificationType.DispensingNotPossibleError,
