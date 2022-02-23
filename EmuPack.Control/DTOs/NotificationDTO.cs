@@ -25,6 +25,7 @@ namespace EmuPack.Control.DTOs
         TcpReceivingError,
         MachineBlockedCommandError,
         DispensingNotPossibleError,
+        DispensingSucessful,
         CassetteWarning
     }
 }
