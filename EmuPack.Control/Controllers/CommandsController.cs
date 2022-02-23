@@ -72,7 +72,7 @@ namespace EmuPack.Control.Controllers
             return Ok(_dispenseHandler.MapDispensingDtoToFillDtos(dto));
         }
 
-        [HttpPost("test-dispensing")]
+        [HttpPost("dispense")]
         public ActionResult TestDispensing(DispensingOperationDTO dto)
         {
             _dispenseHandler.Dispense(dto);
