@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EmuPack.Control.Services.Operations
@@ -22,6 +23,7 @@ namespace EmuPack.Control.Services.Operations
             {
                 _machineClient.Connect(InitializationOperationHandlerValues.Hostname,
                     InitializationOperationHandlerValues.Port);
+                Thread.Sleep(1000);
             }
             if (_machineClient.ConnectedToMachine)
             {
