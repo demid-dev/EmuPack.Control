@@ -1,12 +1,12 @@
 export interface IDispensingOperation {
   prescriptionId: number;
-  dispensingDrugs: IDispensingDrug[]
+  dispensingDrugs: IDispensingDrug[];
 }
 
 export interface IDispensingDrug {
   cassetteId: number;
   drugName: number;
-  usedPods: IUsedPod[]
+  usedPods: IUsedPod[];
 }
 
 export interface IUsedPod {

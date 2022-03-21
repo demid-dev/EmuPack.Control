@@ -14,13 +14,17 @@ export class DispensingFormComponent implements OnInit {
   form: FormGroup;
 
   public constructor(private dispensingService: DispensingService) {
-    this.form = new FormGroup({
-      prescriptionId: new FormControl(1, [Validators.required, Validators.min(1), Validators.max(9999)]),
-      dispensingDrugs: new FormArray([this.createDispensingDrug()])
-    });
+    this.form = this.createForm();
   }
 
   ngOnInit(): void {
+  }
+
+  createForm(): FormGroup {
+    return new FormGroup({
+      prescriptionId: new FormControl(1, [Validators.required, Validators.min(1), Validators.max(9999)]),
+      dispensingDrugs: new FormArray([this.createDispensingDrug()])
+    });
   }
 
   addDispensingDrug() {
@@ -123,5 +127,9 @@ export class DispensingFormComponent implements OnInit {
     }).subscribe(() => {
 
     });
+  }
+
+  clearForm() {
+    this.form = this.createForm();
   }
 }

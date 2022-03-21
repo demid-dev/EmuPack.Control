@@ -4,6 +4,7 @@ using EmuPack.Control.Models.Responses;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,8 +43,9 @@ namespace EmuPack.Control.Services
         {
             if (adaptorInDrawer && prescriptionNotRegistred)
             {
+                Debug.WriteLine("ASDASD");
                 await _hubContext.Clients.All.SendAsync("ReceiveNotification",
-                    GenerateNotificationDTO(NotificationType.DispensingSucessful, null));
+                    GenerateNotificationDTO(NotificationType.DispensingSucessful, new List<WarningFieldDTO>()));
             }
             else
             {

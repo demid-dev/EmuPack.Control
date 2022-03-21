@@ -1,1 +1,21 @@
 <app-dispensing-form></app-dispensing-form>
+
+<button type="button" data-bs-toggle="modal" data-bs-target="#modalButton" #modalButton hidden>
+</button>
+
+<div class="modal fade" id="modalButton" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{notificationTitle}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="notificationActive = false"></button>
+      </div>
+      <div class="modal-body">
+        {{notificationDescription}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="notificationActive = false">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
