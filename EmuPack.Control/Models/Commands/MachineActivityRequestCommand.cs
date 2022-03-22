@@ -49,8 +49,8 @@ namespace EmuPack.Control.Models.Commands
         static public string DataStartNotification { get; private set; }
         static public string DrawerStatusLocked { get; private set; }
         static public string DrawerStatusUnlocked { get; private set; }
-        static public string ClearingInitiated { get; private set; }
         static public string ClearingNotInitiated { get; private set; }
+        static public string ClearingInitiated { get; private set; }
 
         static MachineActivityRequestValues()
         {
@@ -58,8 +58,8 @@ namespace EmuPack.Control.Models.Commands
             DataStartNotification = "D";
             DrawerStatusLocked = "00";
             DrawerStatusUnlocked = "01";
-            ClearingInitiated = "00";
-            ClearingNotInitiated = "01";
+            ClearingNotInitiated = "00";
+            ClearingInitiated = "01";
         }
     }
 }
