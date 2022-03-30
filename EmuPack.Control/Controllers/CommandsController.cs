@@ -33,49 +33,27 @@ namespace EmuPack.Control.Controllers
             _statusHandler = statusHandler;
         }
 
-        [HttpPost("fill")]
-        public ActionResult Fill(FillCommandDTO dto)
+        [HttpPost("reinitialize")]
+        public ActionResult ReinitializeMachine()
         {
-            return Ok(new FillCommand(dto).CommandString);
-        }
-
-        [HttpPost("connect")]
-        public ActionResult ConnectToMachine()
-        {
-            _initHandler.InitializeMachine();
+            try
+            {
+                _initHandler.InitializeMachine();
+            }
+            catch
+            {
+                return BadRequest("Reinitialization of machine failed, " +
+                    "restart the emulator and control application");
+            }
 
             return Ok();
         }
 
-        [HttpGet("connected-status")]
-        public ActionResult GetMachineClientStatus()
-        {
-            return Ok(_machineClient.ConnectedToMachine);
-        }
-
-        [HttpGet("test-status-response")]
-        public ActionResult GetStatusCommandResponseTest()
-        {
-            _statusHandler.UpdateMachineState();
-            return Ok(_machineClient.MachineState);
-        }
-
-        [HttpPost("test-mapping")]
-        public ActionResult TestMapping(DispensingOperationDTO dto)
-        {
-            return Ok(_dispenseHandler.MapDispensingDtoToRegistrationDto(dto));
-        }
-
-        [HttpPost("test-mapping2")]
-        public ActionResult TestMapping2(DispensingOperationDTO dto)
-        {
-            return Ok(_dispenseHandler.MapDispensingDtoToFillDtos(dto));
-        }
-
         [HttpPost("dispense")]
-        public ActionResult TestDispensing(DispensingOperationDTO dto)
+        public ActionResult Dispense(DispensingOperationDTO dto)
         {
             _dispenseHandler.Dispense(dto);
+
             return Ok();
         }
     }

@@ -2,8 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {Form, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {IDispensingOperation, IUsedPod} from "../../models/dispensing-operation";
 import {noPodGreaterThanZero} from "../../validators/used-pods.validator";
-import {DispensingService} from "../../services/dispensing.service";
 import {IDispensingDrugDTO, IDispensingOperationDTO, IUsedPodDTO} from "../../api-models/dispensing-operation-dto";
+import {CommandsService} from "../../services/commands.service";
 
 @Component({
   selector: 'app-dispensing-form',
@@ -13,7 +13,7 @@ import {IDispensingDrugDTO, IDispensingOperationDTO, IUsedPodDTO} from "../../ap
 export class DispensingFormComponent implements OnInit {
   form: FormGroup;
 
-  public constructor(private dispensingService: DispensingService) {
+  public constructor(private commandsService: CommandsService) {
     this.form = this.createForm();
   }
 
@@ -77,7 +77,7 @@ export class DispensingFormComponent implements OnInit {
     return ((formGroup.get('usedPods') as FormArray).controls[idx] as FormGroup);
   }
 
-  sumbit() {
+  submit() {
     let dispensingOperation: IDispensingOperation = {
       prescriptionId: this.form.get('prescriptionId')?.value,
       dispensingDrugs: this.form.get('dispensingDrugs')?.value
@@ -121,11 +121,11 @@ export class DispensingFormComponent implements OnInit {
 
     console.log(dispensingDrugDTOs);
 
-    this.dispensingService.dispense({
+    this.commandsService.dispense({
       PrescriptionId: dispensingOperation.prescriptionId,
       DispensingDrugDTOs: dispensingDrugDTOs
     }).subscribe(() => {
-
+      console.log('1')
     });
   }
 

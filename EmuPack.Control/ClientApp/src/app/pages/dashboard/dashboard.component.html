@@ -1,4 +1,19 @@
 <app-dispensing-form></app-dispensing-form>
+<div class="row">
+  <div class="col-9">
+  </div>
+  <div class="col-3">
+    <button type="button" class="btn submit-btn server-button" (click)="reinitialize()">Reinitialize machine</button>
+  </div>
+</div>
+<div class="row text-line">
+  <div class="col-8">
+  </div>
+  <div class="col-4 text-end">
+    <small class="error">Reinitialize machine to clear registered prescriptions</small>
+  </div>
+</div>
+
 
 <button type="button" data-bs-toggle="modal" data-bs-target="#modalButton" #modalButton hidden>
 </button>

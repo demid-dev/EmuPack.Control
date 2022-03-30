@@ -1,6 +1,7 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {SignalRService} from "../../shared/services/signal-r.service";
 import {Notification} from "../../shared/models/notification";
+import {CommandsService} from "../../shared/services/commands.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +18,8 @@ export class DashboardComponent implements OnInit {
   // @ts-ignore
   @ViewChild('modalButton') content: ElementRef<HTMLElement>;
 
-  constructor(private signalRService: SignalRService) {
+  constructor(private signalRService: SignalRService,
+              private commandsService: CommandsService) {
   }
 
   async ngOnInit(): Promise<void> {
@@ -57,14 +59,29 @@ export class DashboardComponent implements OnInit {
     });
 
     if (notification.notificationType == 5) {
-      console.log('hgh')
-      this.notificationDescription = 'Dispensing operation completed, open the drawer'
+      this.notificationDescription = 'Dispensing operation completed, open the drawer';
     }
-
-    console.log(this.notificationTitle);
   }
 
   private createNotificationModal() {
     this.content.nativeElement.click();
+  }
+
+  reinitialize() {
+    this.commandsService.reinitialize().subscribe(() => {
+      if (!this.notificationActive) {
+        this.notificationActive = true;
+        this.notificationTitle = "Reinitialization successful";
+        this.notificationDescription = "Operation was successful, machine state was reinitialized";
+        this.createNotificationModal();
+      }
+    }, error => {
+      if (!this.notificationActive) {
+        this.notificationActive = true;
+        this.notificationTitle = "Reinitialization failed";
+        this.notificationDescription = "Operation was unsuccessful, try to restart the emulator application";
+        this.createNotificationModal();
+      }
+    });
   }
 }

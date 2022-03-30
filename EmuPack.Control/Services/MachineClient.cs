@@ -1,17 +1,11 @@
 ﻿using EmuPack.Control.DTOs;
-using EmuPack.Control.Models;
 using EmuPack.Control.Models.Commands;
 using EmuPack.Control.Models.Machine;
-using EmuPack.Control.Models.Responses;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace EmuPack.Control.Services
 {
@@ -60,6 +54,7 @@ namespace EmuPack.Control.Services
             }
             catch (Exception)
             {
+                Debug.WriteLine("lobaloba");
                 _notificationService.SendTcpConnectionErrorNotification(hostname, port);
 
                 if (_stream != null)
@@ -73,19 +68,16 @@ namespace EmuPack.Control.Services
         {
             try
             {
-                if (_tcpClient != null)
+                if (_tcpClient != null && _stream != null)
                 {
                     byte[] data = Encoding.ASCII.GetBytes(command.CommandString);
                     _stream.Write(data, 0, data.Length);
                     Thread.Sleep(100);
                 }
-                else
-                {
-                    throw new NullReferenceException();
-                }
             }
             catch (Exception)
             {
+                Debug.WriteLine("bobaboba");
                 _notificationService.SendTcpCommunicationErrorNotification(NotificationType.TcpSendMessageError);
 
                 if (_stream != null)

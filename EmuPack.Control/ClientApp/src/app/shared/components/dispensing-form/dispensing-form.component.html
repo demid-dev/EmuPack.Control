@@ -1,4 +1,4 @@
-<form [formGroup]="form" (ngSubmit)="sumbit()">
+<form [formGroup]="form" (ngSubmit)="submit()">
   <div class="row">
     <div class="col-4">
       <label for="prescriptionId" class="form-label">Prescription number</label>
@@ -134,7 +134,7 @@
     <div class="col-9">
     </div>
     <div class="col-3">
-      <button type="submit" class="btn submit-btn" [disabled]="form.invalid">Dispense</button>
+      <button type="submit" class="btn submit-btn server-button" [disabled]="form.invalid">Dispense</button>
     </div>
   </div>
 </form>
