@@ -17,6 +17,8 @@ export class DashboardComponent implements OnInit {
 
   // @ts-ignore
   @ViewChild('modalButton') content: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('reinitializeButton') reinitializeButton: ElementRef<HTMLElement>;
 
   constructor(private signalRService: SignalRService,
               private commandsService: CommandsService) {
@@ -30,16 +32,12 @@ export class DashboardComponent implements OnInit {
   private addNotificationListener() {
     this.signalRService.hubConnection.on('ReceiveNotification',
       (notification: Notification) => {
-        if (!this.notificationActive) {
-          this.processNotification(notification);
-          this.createNotificationModal();
-          console.log(notification);
-        }
+        this.processNotification(notification);
+        this.createNotificationModal();
       })
   }
 
   private processNotification(notification: Notification) {
-    this.notificationActive = true;
 
     const notificationTypes = {
       0: "Tcp connection error occurred",
@@ -48,7 +46,8 @@ export class DashboardComponent implements OnInit {
       3: "Machine blocked command",
       4: "Dispensing not possible",
       5: "Dispensing was successful",
-      6: "Cassette warning occurred"
+      6: "Cassette warning occurred",
+      7: "Initialization was successful"
     };
 
     // @ts-ignore
@@ -58,8 +57,17 @@ export class DashboardComponent implements OnInit {
       this.notificationDescription += ` ${warningField.fieldName}: ${warningField.value}\n`;
     });
 
+    if (notification.notificationType == 1) {
+      this.notificationDescription = 'Error happened while sending tcp message'
+    }
+    if (notification.notificationType == 2) {
+      this.notificationDescription = 'Error happened while receiving tcp message'
+    }
     if (notification.notificationType == 5) {
       this.notificationDescription = 'Dispensing operation completed, open the drawer';
+    }
+    if (notification.notificationType == 7) {
+      this.notificationDescription = 'Machine state was reinitialized'
     }
   }
 
@@ -68,20 +76,17 @@ export class DashboardComponent implements OnInit {
   }
 
   reinitialize() {
-    this.commandsService.reinitialize().subscribe(() => {
-      if (!this.notificationActive) {
-        this.notificationActive = true;
-        this.notificationTitle = "Reinitialization successful";
-        this.notificationDescription = "Operation was successful, machine state was reinitialized";
-        this.createNotificationModal();
-      }
-    }, error => {
-      if (!this.notificationActive) {
-        this.notificationActive = true;
-        this.notificationTitle = "Reinitialization failed";
-        this.notificationDescription = "Operation was unsuccessful, try to restart the emulator application";
-        this.createNotificationModal();
-      }
-    });
+    this.lockReinitializeButton(this.reinitializeButton);
+
+    this.commandsService.reinitialize()
+      .subscribe(() => {
+      });
+  }
+
+  private lockReinitializeButton(elem: ElementRef) {
+    elem.nativeElement.disabled = true;
+    setTimeout(() => {
+      elem.nativeElement.disabled = false;
+    }, 3000);
   }
 }

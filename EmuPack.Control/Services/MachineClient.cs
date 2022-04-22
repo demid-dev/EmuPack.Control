@@ -54,7 +54,6 @@ namespace EmuPack.Control.Services
             }
             catch (Exception)
             {
-                Debug.WriteLine("lobaloba");
                 _notificationService.SendTcpConnectionErrorNotification(hostname, port);
 
                 if (_stream != null)
@@ -77,7 +76,6 @@ namespace EmuPack.Control.Services
             }
             catch (Exception)
             {
-                Debug.WriteLine("bobaboba");
                 _notificationService.SendTcpCommunicationErrorNotification(NotificationType.TcpSendMessageError);
 
                 if (_stream != null)

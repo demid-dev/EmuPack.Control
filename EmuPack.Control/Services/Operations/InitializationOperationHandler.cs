@@ -11,10 +11,13 @@ namespace EmuPack.Control.Services.Operations
     public class InitializationOperationHandler
     {
         private readonly MachineClient _machineClient;
+        private readonly NotificationService _notificationService;
 
-        public InitializationOperationHandler(MachineClient machineClient)
+        public InitializationOperationHandler(MachineClient machineClient,
+            NotificationService notificationService)
         {
             _machineClient = machineClient;
+            _notificationService = notificationService;
         }
 
         public void InitializeMachine()
@@ -29,6 +32,7 @@ namespace EmuPack.Control.Services.Operations
             {
                 InitializationCommand command = new InitializationCommand();
                 _machineClient.SendCommand(command);
+                _notificationService.SendInitializationSucessfulNotification();
             }
         }
     }

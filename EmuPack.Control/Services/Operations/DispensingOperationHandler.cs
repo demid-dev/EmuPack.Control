@@ -35,9 +35,11 @@ namespace EmuPack.Control.Services.Operations
                 RegistratePrescription(MapDispensingDtoToRegistrationDto(dto));
                 MapDispensingDtoToFillDtos(dto).ForEach(fillDto => ExecuteFilling(fillDto));
             }
-
-            ChangeDrawerStatus(drawerLocked: false);
-            _statusHandler.UpdateMachineState();
+            if (_machineClient.ConnectedToMachine)
+            {
+                ChangeDrawerStatus(drawerLocked: false);
+                _statusHandler.UpdateMachineState();
+            }
         }
 
         private bool DispensingIsPossible(DispensingOperationDTO dto)
@@ -47,6 +49,10 @@ namespace EmuPack.Control.Services.Operations
             if (!_machineClient.ConnectedToMachine)
             {
                 _initializationHandler.InitializeMachine();
+            }
+            if (!_machineClient.ConnectedToMachine)
+            {
+                return false;
             }
             _statusHandler.UpdateMachineState();
             if (_machineClient.MachineState.DrawerOpened)

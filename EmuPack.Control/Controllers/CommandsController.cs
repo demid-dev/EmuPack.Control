@@ -36,15 +36,7 @@ namespace EmuPack.Control.Controllers
         [HttpPost("reinitialize")]
         public ActionResult ReinitializeMachine()
         {
-            try
-            {
-                _initHandler.InitializeMachine();
-            }
-            catch
-            {
-                return BadRequest("Reinitialization of machine failed, " +
-                    "restart the emulator and control application");
-            }
+            _initHandler.InitializeMachine();
 
             return Ok();
         }

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Form, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {IDispensingOperation, IUsedPod} from "../../models/dispensing-operation";
 import {noPodGreaterThanZero} from "../../validators/used-pods.validator";
@@ -12,6 +12,8 @@ import {CommandsService} from "../../services/commands.service";
 })
 export class DispensingFormComponent implements OnInit {
   form: FormGroup;
+  // @ts-ignore
+  @ViewChild('submitButton') submitButton: ElementRef<HTMLElement>;
 
   public constructor(private commandsService: CommandsService) {
     this.form = this.createForm();
@@ -78,6 +80,8 @@ export class DispensingFormComponent implements OnInit {
   }
 
   submit() {
+    this.lockSubmitButton(this.submitButton);
+
     let dispensingOperation: IDispensingOperation = {
       prescriptionId: this.form.get('prescriptionId')?.value,
       dispensingDrugs: this.form.get('dispensingDrugs')?.value
@@ -119,17 +123,21 @@ export class DispensingFormComponent implements OnInit {
       dispensingDrugDTOs.push(drugDTO);
     });
 
-    console.log(dispensingDrugDTOs);
-
     this.commandsService.dispense({
       PrescriptionId: dispensingOperation.prescriptionId,
       DispensingDrugDTOs: dispensingDrugDTOs
     }).subscribe(() => {
-      console.log('1')
     });
   }
 
   clearForm() {
     this.form = this.createForm();
+  }
+
+  lockSubmitButton(elem: ElementRef) {
+    elem.nativeElement.disabled = true;
+    setTimeout(()=>{
+      elem.nativeElement.disabled = false;
+    }, 3000);
   }
 }

@@ -29,7 +29,7 @@ namespace EmuPack.Control.Services
         public async void SendTcpCommunicationErrorNotification(NotificationType notificationType)
         {
             await _hubContext.Clients.All.SendAsync("ReceiveNotification",
-                GenerateNotificationDTO(notificationType, null));
+                GenerateNotificationDTO(notificationType, new List<WarningFieldDTO>()));
         }
 
         public async void SendMachineBlockedCommandNotification(CommandResponse response)
@@ -61,6 +61,12 @@ namespace EmuPack.Control.Services
             await _hubContext.Clients.All.SendAsync("ReceiveNotification",
                 GenerateNotificationDTO(NotificationType.CassetteWarning,
                     GenerateWarningCassettesFields(response)));
+        }
+
+        public async void SendInitializationSucessfulNotification()
+        {
+            await _hubContext.Clients.All.SendAsync("ReceiveNotification",
+                GenerateNotificationDTO(NotificationType.InitializationSucessful, new List<WarningFieldDTO>()));
         }
 
         private List<WarningFieldDTO> GenerateTcpWarningFields(string hostname, int port)
